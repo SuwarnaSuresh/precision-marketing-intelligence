@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Technova - Complete Dashboard Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+        :root {
+            --primary-color: #4a6fff;
+            --secondary-color: #6c757d;
+            --accent-color: #00c9a7;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), #2a4fcc);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero-section {
+            background: linear-gradient(rgba(74, 111, 255, 0.9), rgba(74, 111, 255, 0.8)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%234a6fff"/><path d="M0 0L100 100" stroke="%232a4fcc" stroke-width="2"/><path d="M100 0L0 100" stroke="%232a4fcc" stroke-width="2"/></svg>');
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dashboard-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            transition: border-color 0.3s;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .notification-preferences {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5fd9;
+        }
+        
+        .icon-container {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: rgba(74, 111, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 40px 0;
+            margin-top: auto;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 111, 255, 0.25);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .power-bi-dashboard {
+            background-color: #1a3c85;
+            border-radius: 8px;
+            padding: 20px;
+            color: white;
+            height: 100%;
+        }
+        
+        .dashboard-placeholder {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .active-page {
+            display: block;
+        }
+        
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .processing-status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+        }
+        
+        .report-card {
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .optimization-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+        }
+        
+        .integrated-report {
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .download-options {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        /* New styles for real-time dashboard */
+        .real-time-dashboard {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+        
+        .chart-container {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .chart-placeholder {
+            text-align: center;
+            color: var(--secondary-color);
+        }
+        
+        .prediction-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .download-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .email-notification {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid var(--accent-color);
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .data-table {
+            width: 100%;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .sample-data {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+       .new2 .page {
+            padding: 0 30px;  /* 30px left and right */
+        }
+
+
+    #new2 body, #new2 .container { all: unset; }
+    #new2 .container { max-width: 1200px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    #new2 h1 { text-align: center; margin-bottom: 20px; color: #333; }
+    #new2 h2, #new2 h3 { color: #444; }
+    #new2 .btn { background: #007bff; color: #fff; padding: 8px 14px; margin: 6px 4px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    #new2 .btn:hover { background: #0056b3; }
+    #new2 #dashboard { display: none; margin-top: 25px; }
+    #new2 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+    #new2 .chart-card { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
+    #new2 canvas { max-width: 100%; height: 260px !important; }
+    #new2 select { padding: 6px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    #new2 table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; }
+    #new2 th, #new2 td { padding: 10px; text-align: center; border: 1px solid #ddd; }
+    #new2 th { background: #007bff; color: white; }
+    #new2 tr:nth-child(even) { background: #f4f6f9; }
+    
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="showPage('home')">
+                <i class="fas fa-chart-line me-2"></i>Technova
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('home')">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('dashboards')">Dashboards</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('predictions')">Predictions</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('notifications')">Notifications</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('new2')">Analyzer</a></li>
+        </ul>
+                <div class="d-flex" id="auth-buttons">
+                    <a href="#" class="btn btn-outline-light me-2" onclick="showPage('login')">Login</a>
+                    <a href="#" class="btn btn-light" onclick="showPage('signup')">Sign Up</a>
+                </div>
+                <div id="user-menu" class="d-none">
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i> <span id="username-display">User</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                            </ul>
+        
+      </div>
+    </div>
+  </nav>
+     <!-- Home Page -->
+    <div id="home" class="page active-page">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container text-center">
+                <h1 class="display-4 fw-bold mb-4">Dashboard Integration & AI-Powered Insights</h1>
+                <p class="lead mb-4">Integrate Power BI dashboards, upload datasets for predictions, and receive AI-generated reports via email or SMS.</p>
+                <a href="#features" class="btn btn-light btn-lg px-4">Explore Features</a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="container mb-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Powerful Features</h2>
+                <p class="lead text-muted">Everything you need for data analysis and collaboration</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 p-4">
+                        <div class="icon-container mx-auto">
+                            <i class="fas fa-tachometer-alt fa-2x text-primary"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Dashboard Integration</h5>
+                            <p class="card-text">Seamlessly integrate Power BI dashboards and share them with your team or clients.</p>
+                            <a href="#" onclick="showPage('dashboards')" class="btn btn-outline-primary mt-3">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 p-4">
+                        <div class="icon-container mx-auto">
+                            <i class="fas fa-upload fa-2x text-primary"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">File Upload & Prediction</h5>
+                            <p class="card-text">Upload your datasets and get AI-powered predictions with detailed analysis reports.</p>
+                            <a href="#" onclick="showPage('predictions')" class="btn btn-outline-primary mt-3">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 p-4">
+                        <div class="icon-container mx-auto">
+                            <i class="fas fa-bell fa-2x text-primary"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Smart Notifications</h5>
+                            <p class="card-text">Receive updates and reports via email or SMS based on your preferences.</p>
+                            <a href="#" onclick="showPage('notifications')" class="btn btn-outline-primary mt-3">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 p-4">
+                        <div class="icon-container mx-auto">
+                            <i class="fas fa-chart-bar fa-2x text-primary"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Analyzer</h5>
+                            <p class="card-text">Analyze the dataset and download the summary </p>
+                            <a href="#" onclick="showPage('new2')" class="btn btn-outline-primary mt-3">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Technova</h5>
+                        <p>Powerful dashboard integration and AI-powered prediction platform for teams and businesses.</p>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white text-decoration-none">Home</a></li>
+                            <li><a href="#" class="text-white text-decoration-none">Features</a></li>
+                            <li><a href="#" class="text-white text-decoration-none">Pricing</a></li>
+                            <li><a href="#" class="text-white text-decoration-none">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Legal</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white text-decoration-none">Privacy Policy</a></li>
+                            <li><a href="#" class="text-white text-decoration-none">Terms of Service</a></li>
+                            <li><a href="#" class="text-white text-decoration-none">Data Processing</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Subscribe to Our Newsletter</h5>
+                        <div class="input-group mb-3">
+                            <input type="email" class="form-control" placeholder="Your email address">
+                            <button class="btn btn-primary" type="button">Subscribe</button>
+                        </div>
+                        <div class="d-flex">
+                            <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-white"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-4 mb-4" style="border-color: rgba(255,255,255,0.1);">
+                <div class="text-center">
+                    <p class="mb-0">© 2025 Technova. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login" class="page">
+        <div class="container">
+            <div class="auth-container">
+                <h2 class="text-center mb-4">Login to Your Account</h2>
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label for="login-email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="login-email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="login-password" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember-me">
+                        <label class="form-check-label" for="remember-me">Remember me</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p>Don't have an account? <a href="#" onclick="showPage('signup')">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signup" class="page">
+        <div class="container">
+            <div class="auth-container">
+                <h2 class="text-center mb-4">Create Your Account</h2>
+                <form id="signup-form">
+                    <div class="mb-3">
+                        <label for="signup-name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="signup-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signup-email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="signup-email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signup-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="signup-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="signup-confirm-password" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms-agree" required>
+                        <label class="form-check-label" for="terms-agree">I agree to the <a href="#">Terms of Service</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p>Already have an account? <a href="#" onclick="showPage('login')">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboards Page -->
+    <div id="dashboards" class="page">
+        <div class="container mt-4">
+            <h2 class="mb-4">Dashboard Integration</h2>
+            
+            <div class="dashboard-container">
+                <h3 class="mb-4">Power BI Dashboard Integration</h3>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="power-bi-dashboard">
+                            <div class="dashboard-placeholder">
+                                <i class="fas fa-chart-bar fa-4x mb-3"></i>
+                                <p>Integrated Power BI Dashboard</p>
+                                <div class="progress w-75 mt-2">
+                                    <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Share Dashboard</h5>
+                        <p>Invite team members to view and collaborate on this dashboard.</p>
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="emailInput" placeholder="name@example.com">
+                        </div>
+                        <button class="btn btn-primary w-100">Send Invitation</button>
+                        
+                        <hr class="my-4">
+                        
+                        <h5>Notification Settings</h5>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                            <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="smsNotifications">
+                            <label class="form-check-label" for="smsNotifications">SMS Notifications</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-container mt-4">
+                <h3 class="mb-4">Your Dashboards</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Sales Dashboard</h5>
+                                <p class="card-text">Real-time sales performance metrics and trends</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Marketing Analytics</h5>
+                                <p class="card-text">Campaign performance and ROI analysis</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Customer Insights</h5>
+                                <p class="card-text">Customer behavior and segmentation analysis</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Integrated Reports Section -->
+            <div class="dashboard-container mt-4">
+                <h3 class="mb-4">Integrated Prediction Reports</h3>
+                <p class="text-muted">These reports have been integrated with your dashboard for easy access and visualization.</p>
+                
+                <div id="integratedReports">
+                    <div class="card integrated-report mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Sales Forecast Q3 2023</h5>
+                                    <p class="card-text">Integrated on: September 15, 2023</p>
+                                </div>
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm me-2" onclick="downloadReport('sales-forecast')">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-external-link-alt me-1"></i> View in Dashboard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card integrated-report mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Customer Segmentation Analysis</h5>
+                                    <p class="card-text">Integrated on: September 10, 2023</p>
+                                </div>
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm me-2" onclick="downloadReport('customer-segmentation')">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-external-link-alt me-1"></i> View in Dashboard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i> New prediction reports will appear here after you integrate them from the Predictions page.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Predictions Page -->
+    <div id="predictions" class="page">
+        <div class="container mt-4">
+            <h2 class="mb-4">Dataset Prediction & Analysis</h2>
+            
+            <div class="dashboard-container">
+                <h3 class="mb-4">Upload Dataset for Analysis</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="upload-area" id="dropZone">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-secondary mb-3"></i>
+                            <h5>Upload Your Dataset</h5>
+                            <p class="text-muted">Supported formats: CSV, XLSX, JSON</p>
+                            <input type="file" class="d-none" id="fileInput" accept=".csv,.xlsx,.json">
+                            <button class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">Select File</button>
+                        </div>
+                        <div id="fileDetails" class="d-none">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title" id="fileName">filename.csv</h6>
+                                            <p class="card-text text-muted" id="fileSize">0.0 MB</p>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="resetUpload()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Prediction Type</label>
+                                <select class="form-select" id="predictionType">
+                                    <option value="sales">Sales Forecast</option>
+                                    <option value="customer">Customer Behavior Analysis</option>
+                                    <option value="risk">Risk Assessment</option>
+                                    <option value="custom">Custom Analysis</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Optimization Level</label>
+                                <select class="form-select" id="optimizationLevel">
+                                    <option value="fast">Fast (Basic Analysis)</option>
+                                    <option value="balanced" selected>Balanced (Recommended)</option>
+                                    <option value="detailed">Detailed (Comprehensive Analysis)</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary w-100" onclick="processDataset()">Process Dataset</button>
+                        </div>
+
+                        <!-- Processing Status -->
+                        <div id="processingStatus" class="processing-status d-none">
+                            <h6>Processing Status</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="processingProgress"></div>
+                            </div>
+                            <small id="processingText">Initializing...</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>How It Works</h5>
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <span class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">1</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Upload Dataset</h6>
+                                <p class="text-muted">Upload your dataset in a supported format</p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <span class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">2</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">AI Processing</h6>
+                                <p class="text-muted">Our AI analyzes your data and generates predictions</p>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">3</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Receive Report</h6>
+                                <p class="text-muted">Get detailed reports via email or SMS</p>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h5>Recent Reports</h5>
+                        <div id="reportsList">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Sales Forecast Q3 2023</h6>
+                                        <small>2 days ago</small>
+                                    </div>
+                                    <p class="mb-1">Processed successfully - Sent to email</p>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Customer Segmentation</h6>
+                                        <small>1 week ago</small>
+                                    </div>
+                                    <p class="mb-1">Processed successfully - Sent via SMS</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section (initially hidden) -->
+            <div id="resultsSection" class="dashboard-container mt-4 d-none">
+                <h3 class="mb-4">Prediction Results</h3>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i> Your dataset has been processed successfully! The report has been sent to your email.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card report-card">
+                            <div class="card-body">
+                                <span class="badge bg-success optimization-tag">Optimized</span>
+                                <h5 class="card-title">Summary Report</h5>
+                                <p class="card-text">Key insights and predictions from your data analysis.</p>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Accuracy Score: <span class="fw-bold">94.5%</span></li>
+                                    <li class="list-group-item">Processing Time: <span class="fw-bold" id="processingTime">45 seconds</span></li>
+                                    <li class="list-group-item">Records Processed: <span class="fw-bold" id="recordsProcessed">10,000</span></li>
+                                </ul>
+                                
+                                <div class="download-options mt-3">
+                                    <h6>Download Options</h6>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="downloadReport('pdf')">
+                                            <i class="fas fa-file-pdf me-1"></i> PDF
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="downloadReport('excel')">
+                                            <i class="fas fa-file-excel me-1"></i> Excel
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="downloadReport('csv')">
+                                            <i class="fas fa-file-csv me-1"></i> CSV
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="downloadReport('json')">
+                                            <i class="fas fa-file-code me-1"></i> JSON
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card report-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Integration Options</h5>
+                                <p class="card-text">Add this prediction report to your dashboard for ongoing monitoring and visualization.</p>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Select Dashboard</label>
+                                    <select class="form-select" id="dashboardSelect">
+                                        <option value="sales">Sales Dashboard</option>
+                                        <option value="marketing">Marketing Analytics</option>
+                                        <option value="customer">Customer Insights</option>
+                                        <option value="new">Create New Dashboard</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="addToDashboard">
+                                    <label class="form-check-label" for="addToDashboard">Integrate with selected dashboard</label>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" onclick="integrateWithDashboard()">
+                                        <i class="fas fa-tachometer-alt me-1"></i> Integrate with Dashboard
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="showPage('dashboards')">
+                                        <i class="fas fa-external-link-alt me-1"></i> View All Dashboards
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Real-time Dashboard Section -->
+                <div id="realTimeDashboard" class="real-time-dashboard d-none">
+                    <div class="dashboard-header">
+                        <h4>Real-time Analysis Dashboard</h4>
+                        <span class="prediction-badge">Live</span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value" id="metric1">94.5%</div>
+                                <div class="metric-label">Prediction Accuracy</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value" id="metric2">12.8%</div>
+                                <div class="metric-label">Growth Forecast</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value" id="metric3">$245K</div>
+                                <div class="metric-label">Revenue Prediction</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value" id="metric4">3.2</div>
+                                <div class="metric-label">Risk Factor</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="analysisChart"></canvas>
+                    </div>
+                    
+                    <h5 class="mt-4">Sample Data Preview</h5>
+                    <div class="sample-data">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Product</th>
+                                    <th>Region</th>
+                                    <th>Sales</th>
+                                    <th>Prediction</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sampleDataBody">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-outline-primary me-2" onclick="refreshDashboard()">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh Data
+                        </button>
+                        <button class="btn btn-primary" onclick="saveDashboard()">
+                            <i class="fas fa-save me-1"></i> Save Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Page -->
+    <div id="notifications" class="page">
+        <div class="container mt-4">
+            <h2 class="mb-4">Notification Preferences</h2>
+            
+            <div class="notification-preferences">
+                <h3 class="mb-4">Manage Your Notification Settings</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Email Notifications</h5>
+                        <div class="mb-3">
+                            <label for="emailAddress" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="emailAddress" value="your.email@example.com">
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="dashboardUpdate" checked>
+                            <label class="form-check-label" for="dashboardUpdate">Dashboard updates</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="reportReady" checked>
+                            <label class="form-check-label" for="reportReady">Report ready alerts</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="weeklySummary">
+                            <label class="form-check-label" for="weeklySummary">Weekly summary reports</label>
+                        </div>
+                        <button class="btn btn-primary" onclick="savePreferences()">Save Email Preferences</button>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>SMS Notifications</h5>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" value="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="urgentAlerts">
+                            <label class="form-check-label" for="urgentAlerts">Urgent alerts only</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="reportSms">
+                            <label class="form-check-label" for="reportSms">Report ready alerts</label>
+                        </div>
+                        <button class="btn btn-primary" onclick="savePreferences()">Save SMS Preferences</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-container mt-4">
+                <h3 class="mb-4">Notification History</h3>
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Sales Report Generated</h6>
+                            <small>Today, 10:30 AM</small>
+                        </div>
+                        <p class="mb-1">Your sales forecast report is ready for download.</p>
+                        <small>Sent via Email</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Dashboard Updated</h6>
+                            <small>Yesterday, 3:45 PM</small>
+                        </div>
+                        <p class="mb-1">Your marketing dashboard has been updated with new data.</p>
+                        <small>Sent via SMS</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Weekly Summary</h6>
+                            <small>5 days ago</small>
+                        </div>
+                        <p class="mb-1">Your weekly performance summary is available.</p>
+                        <small>Sent via Email</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Notification -->
+    <div id="downloadNotification" class="download-notification">
+        <i class="fas fa-check-circle me-2"></i>
+        <span id="downloadMessage">Your file is downloading...</span>
+    </div>
+
+    <!-- Email Notification -->
+    <div id="emailNotification" class="email-notification">
+        <i class="fas fa-envelope me-2 text-primary"></i>
+        <span>Report has been sent to your email address.</span>
+    </div>
+
+
+    <!-- Analyzer named as New2 -->
+    <div id="new2" class="page">
+      <div class="container">
+        <h1>📊 Smart Dataset Analyzer</h1>
+        <input type="file" id="fileInput2" accept=".csv">
+        <button class="btn" onclick="uploadFile2()">Upload Dataset</button>
+
+        <div id="selectors2" style="display:none;">
+            <h3>Choose Analysis Options</h3>
+            <label>Category Column (String):</label>
+            <select id="stringColumn2"></select><br>
+            <label>Numeric Column:</label>
+            <select id="numericColumn2"></select><br>
+            <label>Aggregation:</label>
+            <select id="aggregation2">
+                <option value="count">Count</option>
+                <option value="sum">Sum</option>
+                <option value="avg">Average</option>
+                <option value="min">Min</option>
+                <option value="max">Max</option>
+            </select><br>
+                <button class="btn" onclick="analyzeDataset2()">Analyze</button>
+        </div>
+
+<div id="dashboard2">
+  <h2>Analysis Dashboard</h2>
+  <div class="dashboard-grid">
+    <div class="chart-card"><canvas id="barChart2"></canvas></div>
+    <div class="chart-card"><canvas id="lineChart2"></canvas></div>
+    <div class="chart-card"><canvas id="pieChart2"></canvas></div>
+    <div class="chart-card"><canvas id="hBarChart2"></canvas></div> 
+  </div>
+
+  <!-- smaller button under charts -->
+  <div class="text-center mt-3">
+    <button class="btn btn-sm" onclick="downloadDashboard2()">⬇ Download Dashboard</button>
+  </div>
+
+  <h3 class="mt-4">📋 Summary Table</h3>
+  <button class="btn" onclick="downloadSummary2()">⬇ Download Summary (CSV)</button>
+  <table id="summaryTable2"></table>
+</div>
+
+    </div>
+  </div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Current user state
+        let currentUser = null;
+        let processingInterval = null;
+        let currentReport = null;
+        let analysisChart = null;
+        let uploadedData = null;
+
+        // DOM elements
+        const authButtons = document.getElementById('auth-buttons');
+        const userMenu = document.getElementById('user-menu');
+        const usernameDisplay = document.getElementById('username-display');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUIForUser();
+            }
+
+            // Set up form submissions
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('signup-form').addEventListener('submit', handleSignup);
+
+            // Set up file upload functionality
+            setupFileUpload();
+        });
+
+        /**
+         * Shows the specified page and hides all others
+         * @param {string} pageId - The ID of the page to show
+         */
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active-page');
+            });
+
+            // Show the requested page
+            document.getElementById(pageId).classList.add('active-page');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * Handles login form submission
+         * @param {Event} e - The form submission event
+         */
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            // Simple validation
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // In a real application, this would be an API call to authenticate
+            // For demo purposes, we'll simulate a successful login
+            currentUser = {
+                name: email.split('@')[0],
+                email: email
+            };
+
+            // Save to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            // Update UI
+            updateUIForUser();
+
+            // Show success message and redirect to home
+            alert('Login successful!');
+            showPage('home');
+        }
+
+        /**
+         * Handles signup form submission
+         * @param {Event} e - The form submission event
+         */
+        function handleSignup(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+            // Simple validation
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            // In a real application, this would be an API call to register the user
+            // For demo purposes, we'll simulate a successful registration
+            currentUser = {
+                name: name,
+                email: email
+            };
+
+            // Save to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            // Update UI
+            updateUIForUser();
+
+            // Show success message and redirect to home
+            alert('Registration successful! You are now logged in.');
+            showPage('home');
+        }
+
+        /**
+         * Updates the UI to reflect the logged-in user state
+         */
+        function updateUIForUser() {
+            if (currentUser) {
+                // Show user menu and hide auth buttons
+                authButtons.classList.add('d-none');
+                userMenu.classList.remove('d-none');
+                
+                // Update username display
+                usernameDisplay.textContent = currentUser.name;
+            } else {
+                // Show auth buttons and hide user menu
+                authButtons.classList.remove('d-none');
+                userMenu.classList.add('d-none');
+            }
+        }
+
+        /**
+         * Logs out the current user
+         */
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUIForUser();
+            showPage('home');
+            alert('You have been logged out.');
+        }
+
+        /**
+         * Sets up file upload functionality
+         */
+        function setupFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+
+            // Handle file selection via button
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    handleFileSelection(this.files[0]);
+                }
+            });
+
+            // Handle drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            dropZone.addEventListener('drop', handleDrop, false);
+        }
+
+        /**
+         * Prevents default behavior for drag and drop events
+         * @param {Event} e - The event
+         */
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        /**
+         * Highlights the drop zone when files are dragged over it
+         */
+        function highlight() {
+            document.getElementById('dropZone').style.borderColor = 'var(--primary-color)';
+            document.getElementById('dropZone').style.backgroundColor = 'rgba(74, 111, 255, 0.05)';
+        }
+
+        /**
+         * Removes highlight from the drop zone
+         */
+        function unhighlight() {
+            document.getElementById('dropZone').style.borderColor = '#ccc';
+            document.getElementById('dropZone').style.backgroundColor = '';
+        }
+
+        /**
+         * Handles files dropped onto the drop zone
+         * @param {Event} e - The drop event
+         */
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length) {
+                handleFileSelection(files[0]);
+            }
+        }
+
+        /**
+         * Handles the selected file and updates the UI
+         * @param {File} file - The selected file
+         */
+        function handleFileSelection(file) {
+            const fileName = file.name;
+            const fileSize = (file.size / (1024 * 1024)).toFixed(2); // MB
+            
+            document.getElementById('fileName').textContent = fileName;
+            document.getElementById('fileSize').textContent = fileSize + ' MB';
+            document.getElementById('fileDetails').classList.remove('d-none');
+            
+            // Read and parse the file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    // For demo purposes, we'll generate sample data based on file type
+                    if (fileName.endsWith('.csv')) {
+                        uploadedData = parseCSV(e.target.result);
+                    } else if (fileName.endsWith('.json')) {
+                        uploadedData = JSON.parse(e.target.result);
+                    } else {
+                        // For other formats, generate sample data
+                        uploadedData = generateSampleData();
+                    }
+                    
+                    console.log('Uploaded data:', uploadedData);
+                } catch (error) {
+                    console.error('Error parsing file:', error);
+                    alert('Error parsing file. Using sample data for demonstration.');
+                    uploadedData = generateSampleData();
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /**
+         * Parses CSV content into an array of objects
+         * @param {string} csv - The CSV content
+         */
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                const obj = {};
+                const currentline = lines[i].split(',');
+                
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentline[j] ? currentline[j].trim() : '';
+                }
+                
+                result.push(obj);
+            }
+            
+            return result;
+        }
+
+        /**
+         * Generates sample data for demonstration
+         */
+        function generateSampleData() {
+            const products = ['Product A', 'Product B', 'Product C', 'Product D'];
+            const regions = ['North', 'South', 'East', 'West'];
+            const data = [];
+            
+            for (let i = 0; i < 100; i++) {
+                data.push({
+                    date: `2023-${Math.floor(Math.random() * 12) + 1}-${Math.floor(Math.random() * 28) + 1}`,
+                    product: products[Math.floor(Math.random() * products.length)],
+                    region: regions[Math.floor(Math.random() * regions.length)],
+                    sales: Math.floor(Math.random() * 10000) + 1000,
+                    prediction: Math.floor(Math.random() * 10000) + 1000
+                });
+            }
+            
+            return data;
+        }
+
+        /**
+         * Resets the file upload UI
+         */
+        function resetUpload() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileDetails').classList.add('d-none');
+            document.getElementById('processingStatus').classList.add('d-none');
+            document.getElementById('resultsSection').classList.add('d-none');
+            document.getElementById('realTimeDashboard').classList.add('d-none');
+            
+            // Clear any ongoing processing
+            if (processingInterval) {
+                clearInterval(processingInterval);
+                processingInterval = null;
+            }
+        }
+
+        /**
+         * Processes the dataset with visual feedback
+         */
+        function processDataset() {
+            if (!uploadedData) {
+                alert('Please upload a file first');
+                return;
+            }
+            
+            const optimizationLevel = document.getElementById('optimizationLevel').value;
+            const predictionType = document.getElementById('predictionType').value;
+            
+            // Show processing status
+            document.getElementById('processingStatus').classList.remove('d-none');
+            
+            // Determine processing time based on optimization level
+            let totalTime;
+            switch(optimizationLevel) {
+                case 'fast':
+                    totalTime = 20000; // 20 seconds
+                    break;
+                case 'balanced':
+                    totalTime = 30000; // 30 seconds
+                    break;
+                case 'detailed':
+                    totalTime = 45000; // 45 seconds
+                    break;
+                default:
+                    totalTime = 30000; // Default 30 seconds
+            }
+            
+            const progressBar = document.getElementById('processingProgress');
+            const processingText = document.getElementById('processingText');
+            
+            let progress = 0;
+            const intervalTime = totalTime / 100;
+            
+            // Clear any existing interval
+            if (processingInterval) {
+                clearInterval(processingInterval);
+            }
+            
+            // Store current report details
+            const reportTitle = {
+                'sales': 'Sales Forecast',
+                'customer': 'Customer Analysis',
+                'risk': 'Risk Assessment',
+                'custom': 'Custom Analysis'
+            }[predictionType] || 'Data Analysis';
+            
+            currentReport = {
+                title: reportTitle,
+                type: predictionType,
+                optimization: optimizationLevel,
+                date: new Date().toLocaleDateString(),
+                processingTime: optimizationLevel === 'fast' ? '20 seconds' : 
+                              optimizationLevel === 'balanced' ? '30 seconds' : '45 seconds',
+                records: uploadedData.length
+            };
+            
+            // Start processing simulation
+            processingInterval = setInterval(() => {
+                progress += 1;
+                progressBar.style.width = `${progress}%`;
+                
+                // Update status text based on progress
+                if (progress < 30) {
+                    processingText.textContent = `Uploading dataset... ${progress}%`;
+                } else if (progress < 70) {
+                    processingText.textContent = `Analyzing data patterns... ${progress}%`;
+                } else {
+                    processingText.textContent = `Generating predictions... ${progress}%`;
+                }
+                
+                // When processing is complete
+                if (progress >= 100) {
+                    clearInterval(processingInterval);
+                    processingInterval = null;
+                    
+                    // Show completion message briefly
+                    processingText.textContent = 'Processing complete! Generating report...';
+                    
+                    // Show results after a short delay
+                    setTimeout(() => {
+                        document.getElementById('processingStatus').classList.add('d-none');
+                        showResults();
+                    }, 1500);
+                }
+            }, intervalTime);
+        }
+
+        /**
+         * Displays the results of the processing
+         */
+        function showResults() {
+            const resultsSection = document.getElementById('resultsSection');
+            const processingTime = document.getElementById('processingTime');
+            const recordsProcessed = document.getElementById('recordsProcessed');
+            
+            // Set results based on optimization level
+            processingTime.textContent = currentReport.processingTime;
+            recordsProcessed.textContent = currentReport.records.toLocaleString();
+            
+            // Show results section
+            resultsSection.classList.remove('d-none');
+            
+            // Show real-time dashboard
+            document.getElementById('realTimeDashboard').classList.remove('d-none');
+            
+            // Initialize the dashboard with data
+            initializeDashboard();
+            
+            // Show email notification
+            const emailNotification = document.getElementById('emailNotification');
+            emailNotification.style.display = 'block';
+            
+            // Hide email notification after 5 seconds
+            setTimeout(() => {
+                emailNotification.style.display = 'none';
+            }, 5000);
+            
+            // Add to recent reports
+            const reportsList = document.getElementById('reportsList');
+            const newReport = document.createElement('div');
+            newReport.className = 'list-group';
+            newReport.innerHTML = `
+                <a href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${currentReport.title} Report</h6>
+                        <small>Just now</small>
+                    </div>
+                    <p class="mb-1">Processed successfully - ${currentReport.optimization} optimization</p>
+                </a>
+            `;
+            
+            // Prepend new report to the list
+            reportsList.prepend(newReport);
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /**
+         * Initializes the dashboard with data visualizations
+         */
+        function initializeDashboard() {
+            // Update metrics
+            document.getElementById('metric1').textContent = '94.5%';
+            document.getElementById('metric2').textContent = '12.8%';
+            document.getElementById('metric3').textContent = '$245K';
+            document.getElementById('metric4').textContent = '3.2';
+            
+            // Create chart
+            const ctx = document.getElementById('analysisChart').getContext('2d');
+            
+            // Destroy previous chart if it exists
+            if (analysisChart) {
+                analysisChart.destroy();
+            }
+            
+            // Generate chart data based on uploaded data
+            const chartData = generateChartData();
+            
+            analysisChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Actual Sales',
+                        data: chartData.actual,
+                        borderColor: '#4a6fff',
+                        tension: 0.1,
+                        fill: false
+                    }, {
+                        label: 'Predicted Sales',
+                        data: chartData.predicted,
+                        borderColor: '#00c9a7',
+                        tension: 0.1,
+                        fill: false,
+                        borderDash: [5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Sales Forecast with Predictions'
+                        }
+                    }
+                }
+            });
+            
+            // Populate sample data table
+            populateSampleData();
+        }
+
+        /**
+         * Generates chart data from uploaded data
+         */
+        function generateChartData() {
+            // For demo purposes, we'll generate sample chart data
+            // In a real application, this would be derived from the uploaded data
+            const labels = [];
+            const actual = [];
+            const predicted = [];
+            
+            for (let i = 1; i <= 12; i++) {
+                labels.push(`Month ${i}`);
+                actual.push(Math.floor(Math.random() * 10000) + 5000);
+                predicted.push(Math.floor(Math.random() * 10000) + 5000);
+            }
+            
+            return { labels, actual, predicted };
+        }
+
+        /**
+         * Populates the sample data table
+         */
+        function populateSampleData() {
+            const tableBody = document.getElementById('sampleDataBody');
+            tableBody.innerHTML = '';
+            
+            // Show up to 10 rows of data
+            const displayData = uploadedData.slice(0, 10);
+            
+            displayData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.date || 'N/A'}</td>
+                    <td>${row.product || 'N/A'}</td>
+                    <td>${row.region || 'N/A'}</td>
+                    <td>${row.sales ? '$' + row.sales.toLocaleString() : 'N/A'}</td>
+                    <td>${row.prediction ? '$' + row.prediction.toLocaleString() : 'N/A'}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        /**
+         * Integrates the current report with the dashboard
+         */
+        function integrateWithDashboard() {
+            if (!currentReport) {
+                alert('No report available to integrate. Please process a dataset first.');
+                return;
+            }
+            
+            const addToDashboard = document.getElementById('addToDashboard').checked;
+            const dashboardSelect = document.getElementById('dashboardSelect').value;
+            
+            if (!addToDashboard) {
+                alert('Please check the "Integrate with selected dashboard" option to proceed.');
+                return;
+            }
+            
+            // Simulate integration process
+            alert(`"${currentReport.title}" report has been successfully integrated with your ${dashboardSelect} dashboard!`);
+            
+            // Show success message
+            showPage('dashboards');
+            
+            // Add to integrated reports section
+            const integratedReports = document.getElementById('integratedReports');
+            const newIntegratedReport = document.createElement('div');
+            newIntegratedReport.className = 'card integrated-report mb-3';
+            newIntegratedReport.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">${currentReport.title}</h5>
+                            <p class="card-text">Integrated on: ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-primary btn-sm me-2" onclick="downloadReport('${currentReport.type}')">
+                                <i class="fas fa-download me-1"></i> Download
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i> View in Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Prepend to integrated reports
+            integratedReports.prepend(newIntegratedReport);
+        }
+
+        /**
+         * Downloads a report in the specified format
+         * @param {string} format - The format to download (pdf, excel, csv, json)
+         */
+        function downloadReport(format) {
+            if (!currentReport) {
+                alert('No report available to download. Please process a dataset first.');
+                return;
+            }
+            
+            const formatNames = {
+                'pdf': 'PDF',
+                'excel': 'Excel',
+                'csv': 'CSV',
+                'json': 'JSON',
+                'sales-forecast': 'PDF',
+                'customer-segmentation': 'PDF'
+            };
+            
+            const formatName = formatNames[format] || 'PDF';
+            const fileName = `${currentReport.title.replace(/\s+/g, '_')}_Report.${format}`;
+            
+            // Create report content with summary
+            let content = `Technova ANALYSIS REPORT\n`;
+            content += `============================\n\n`;
+            content += `Report Title: ${currentReport.title}\n`;
+            content += `Generated on: ${new Date().toLocaleDateString()}\n`;
+            content += `Processing Time: ${currentReport.processingTime}\n`;
+            content += `Records Processed: ${currentReport.records.toLocaleString()}\n`;
+            content += `Prediction Accuracy: 94.5%\n\n`;
+            
+            content += `KEY INSIGHTS\n`;
+            content += `=============\n`;
+            content += `- Overall sales trend shows 12.8% growth compared to previous period\n`;
+            content += `- Top performing product: Product C with 23% increase in sales\n`;
+            content += `- Highest growth region: West with 18.2% increase\n`;
+            content += `- Predicted revenue for next quarter: $245,000\n\n`;
+            
+            content += `RECOMMENDATIONS\n`;
+            content += `===============\n`;
+            content += `1. Increase inventory for Product C to meet growing demand\n`;
+            content += `2. Expand marketing efforts in the West region\n`;
+            content += `3. Consider introducing a loyalty program to retain customers\n`;
+            
+            // Create a blob with the report content
+            const blob = new Blob([content], { type: 'text/plain' });
+            
+            // Create a download link and trigger the download
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            // Show download notification
+            const downloadNotification = document.getElementById('downloadNotification');
+            const downloadMessage = document.getElementById('downloadMessage');
+            
+            downloadMessage.textContent = `Downloaded ${fileName} successfully!`;
+            downloadNotification.style.display = 'flex';
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                downloadNotification.style.display = 'none';
+            }, 3000);
+        }
+
+        /**
+         * Saves notification preferences
+         */
+        function savePreferences() {
+            alert('Notification preferences saved successfully!');
+        }
+
+        /**
+         * Refreshes the real-time dashboard data
+         */
+        function refreshDashboard() {
+            // Simulate data refresh by slightly modifying the metrics
+            document.getElementById('metric1').textContent = (94 + Math.random() * 2).toFixed(1) + '%';
+            document.getElementById('metric2').textContent = (12 + Math.random() * 2).toFixed(1) + '%';
+            document.getElementById('metric3').textContent = '$' + (240 + Math.random() * 10).toFixed(0) + 'K';
+            document.getElementById('metric4').textContent = (3 + Math.random() * 0.4).toFixed(1);
+            
+            // Update chart with new data
+            const chartData = generateChartData();
+            analysisChart.data.datasets[0].data = chartData.actual;
+            analysisChart.data.datasets[1].data = chartData.predicted;
+            analysisChart.update();
+            
+            // Show a brief notification
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info alert-dismissible fade show';
+            notification.innerHTML = `
+                <span>Dashboard data refreshed successfully!</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.getElementById('realTimeDashboard').prepend(notification);
+            
+            // Auto-dismiss after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 150);
+            }, 3000);
+        }
+
+        /**
+         * Saves the current dashboard state
+         */
+        function saveDashboard() {
+            alert('Dashboard saved successfully! You can access it from the Dashboards page.');
+            showPage('dashboards');
+        }
+ // New2 script (renamed to avoid conflicts)
+    let dataset2 = [];
+    let barChart2, lineChart2, pieChart2, hBarChart2;
+    let summaryLabels2 = [], summaryValues2 = [], summaryValueLabel2 = "";
+
+
+    function uploadFile2() {
+      const file = document.getElementById("fileInput2").files[0];
+      if (!file) { alert("Please select a CSV file."); return; }
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        complete: function(results) {
+          dataset2 = results.data.filter(r => Object.values(r).some(v => v));
+          const columns = Object.keys(dataset2[0]);
+          const stringSel = document.getElementById("stringColumn2");
+          const numSel = document.getElementById("numericColumn2");
+          stringSel.innerHTML = "<option value=''>-- None --</option>";
+          numSel.innerHTML = "<option value=''>-- None --</option>";
+          columns.forEach(col => {
+            let firstVal = dataset2.find(r => r[col])?.[col];
+            let opt = document.createElement("option");
+            opt.value = opt.text = col;
+            if (typeof firstVal === "number") numSel.add(opt); else stringSel.add(opt);
+          });
+          document.getElementById("selectors2").style.display = "block";
+        }
+      });
+    }
+
+    function analyzeDataset2() {
+      const stringCol = document.getElementById("stringColumn2").value;
+      const numericCol = document.getElementById("numericColumn2").value;
+      const agg = document.getElementById("aggregation2").value;
+      if (!stringCol) { alert("Pick category column."); return; }
+      let grouped = {};
+      dataset2.forEach(row => {
+        let cat = row[stringCol];
+        let val = numericCol ? Number(row[numericCol]) : 1;
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(val);
+      });
+      let labels = Object.keys(grouped);
+      let values = labels.map(l => {
+        let arr = grouped[l];
+        switch(agg) {
+          case "sum": return arr.reduce((a,b)=>a+(isNaN(b)?0:b),0);
+          case "avg": return arr.reduce((a,b)=>a+(isNaN(b)?0:b),0)/arr.length;
+          case "min": return Math.min(...arr);
+          case "max": return Math.max(...arr);
+          default: return arr.length;
+        }
+      });
+      summaryLabels2 = labels; summaryValues2 = values; summaryValueLabel2 = agg+" of "+(numericCol||stringCol);
+      document.getElementById("dashboard2").style.display="block";
+      renderCharts2(labels, values, summaryValueLabel2);
+      renderTable2(labels, values, summaryValueLabel2);
+    }
+
+  function renderCharts2(labels, values, label) {
+  // Destroy old charts if they exist
+  if (barChart2) barChart2.destroy();
+  if (lineChart2) lineChart2.destroy();
+  if (pieChart2) pieChart2.destroy();
+  if (hBarChart2) hBarChart2.destroy();
+
+  // Bar Chart
+  barChart2 = new Chart(document.getElementById("barChart2"), {
+    type: "bar",
+    data: { labels, datasets: [{ label, data: values, backgroundColor: "rgba(75,192,192,0.7)", borderRadius: 6 }] },
+    options: { plugins: { legend: { display: false } }, responsive: true }
+  });
+
+  // Line Chart
+  lineChart2 = new Chart(document.getElementById("lineChart2"), {
+    type: "line",
+    data: { labels, datasets: [{ label, data: values, borderColor: "#007bff", backgroundColor: "#007bff33", tension: 0.3, fill: true }] },
+    options: { responsive: true }
+  });
+
+  // Pie Chart
+  pieChart2 = new Chart(document.getElementById("pieChart2"), {
+    type: "pie",
+    data: { labels, datasets: [{ data: values, backgroundColor: generateColors(values.length) }] },
+    options: { responsive: true }
+  });
+
+  // Horizontal Bar Chart
+  hBarChart2 = new Chart(document.getElementById("hBarChart2"), {
+    type: "bar",
+    data: { labels, datasets: [{ label, data: values, backgroundColor: "rgba(0,201,167,0.7)" }] },
+    options: {
+      indexAxis: "y", 
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function generateColors(count) {
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    colors.push(`hsl(${i * 360 / count}, 70%, 60%)`);
+  }
+  return colors;
+}
+
+
+
+    function renderTable2(labels, values, label) {
+      let table = "<tr><th>Category</th><th>"+label+"</th></tr>";
+      labels.forEach((l,i)=> table+=`<tr><td>${l}</td><td>${values[i]}</td></tr>`);
+      document.getElementById("summaryTable2").innerHTML=table;
+    }
+
+    function downloadSummary2() {
+      if (!summaryLabels2.length) return alert("No summary.");
+      let csv="Category,"+summaryValueLabel2+"\n";
+      summaryLabels2.forEach((l,i)=> csv+=`${l},${summaryValues2[i]}\n`);
+      let blob=new Blob([csv],{type:"text/csv"}); let a=document.createElement("a");
+      a.href=URL.createObjectURL(blob); a.download="summary.csv"; a.click();
+    }
+    // Download the whole Analyzer dashboard as PNG
+    function downloadDashboard2() {
+    const dashboardElement = document.getElementById("dashboard2");
+        html2canvas(dashboardElement).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "analyzer_dashboard.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    });
+    }
+
+  </script>
+</body>
+</html>
